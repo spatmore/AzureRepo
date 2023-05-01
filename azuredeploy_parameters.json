@@ -1,0 +1,58 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": { 
+                "vnetname": {
+        "type": "string",
+        "value": "vnet-infrastructure" //Default value is vnet-infrastructure
+    },
+        "vnetaddress": {
+        "type": "string",
+        "value": "192.168.240.0/20" //Default value is 192.168.240.0/20
+    },
+        "snetname": {
+        "type": "string",
+        "value": "snet-data", //Default value is snet-data
+    },
+        "snetprefix": {
+        "type": "string",
+        "value": "192.168.251.0/24", //Default value is 192.168.251.0/24
+    },
+        "vpngatewayname": {
+        "type": "string",
+        "value": "vgw-infrastructure",  //Default value is vgw-infrastructure
+    },
+        "vgwsubnetprefix": {
+        "type": "string",
+        "value": "192.168.255.0/24",  //Default value is 192.168.255.0/24
+    },
+        "vgwpublicipname": {
+        "type": "string",
+        "value": "pip-vgw-infrastructure-01",  //Default value is pip-vgw-infrastructure-01
+    },
+        "vpngatewaysku": {
+        "type": "string",
+        "value": "Basic",  //Default value is Basic. Acceptable options are Basic,VPNGW1,VPNGW2
+    },
+        "localgatewayname": {
+        "type": "string",
+        "value": "lgw-dcloud-01",  //Default value is lgw-dcloud-01
+    },
+        "lgwsubnet": {
+        "type": "string",
+        "value": "",   //This value is required
+    },
+        "lgwgatewayip": {
+        "type": "string",
+        "value": "",   //This value is required
+    },
+        "vpnconnectionname": {
+        "type": "string",
+        "value": "cn-vgw-infrastructure-to-lgw-dcloud",  //Default value is cn-vgw-infrastructure-to-lgw-dcloud
+    },
+        "vpnconnectionsharedkey": {
+        "type": "string",
+        "value": "",  //This value is required
+    }
+    }
+}

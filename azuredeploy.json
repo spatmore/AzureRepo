@@ -1,0 +1,220 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vnetname": {
+        "type": "string",
+        "defaultValue": "vnet-infrastructure",
+        "metadata": {
+            "description": "The name of the Virtual Network eg vnet-infrastructure"
+        }
+    },
+        "vnetaddress": {
+        "type": "string",
+        "defaultValue": "192.168.240.0/20",
+        "metadata": {
+            "description": "The Address space for the virtual network eg 192.168.240.0/20"
+        }
+    },
+        "snetname": {
+        "type": "string",
+        "defaultValue": "snet-data",
+        "metadata": {
+            "description": "The name of the Subnet for the Virtual network eg snet-data"
+        }
+    },
+        "snetprefix": {
+        "type": "string",
+        "defaultValue": "192.168.251.0/24",
+        "metadata": {
+            "description": "The Address Prefix for the subnet eg 192.168.251.0/24"
+        }
+    },
+        "vpngatewayname": {
+        "type": "string",
+        "defaultValue": "vgw-infrastructure",
+        "metadata": {
+            "description": "The name of the VPN Gateway eg vgw-infrastructure"
+        }
+    },
+        "vgwsubnetname": {
+        "type": "string",
+        "defaultValue": "GatewaySubnet",
+        "metadata": {
+            "description": "The Name of the VPN Gateway subnet. This must be GatewaySubnet"
+        }
+    },
+        "vgwsubnetprefix": {
+        "type": "string",
+        "defaultValue": "192.168.255.0/24",
+        "metadata": {
+            "description": "The Address Prefix of the VPN Gateway Subnet eg 192.168.254.0/24"
+        }
+    },
+        "vgwpublicipname": {
+        "type": "string",
+        "defaultValue": "pip-vgw-infrastructure-01",
+        "metadata": {
+            "description": "The name of the public IP for the VPN gateway eg pip-vgw-infrastructure-01"
+        }
+    },
+        "vpngatewaysku": {
+        "type": "string",
+        "defaultvalue": "Basic",
+        "allowedValues": [
+            "Basic",
+            "VpnGw1",
+            "VpnGw2"
+        ],
+            "metadata": {
+            "description": "The SKU of the VPN Gateway"
+        }
+    },
+        "localgatewayname": {
+        "type": "string",
+        "defaultValue": "lgw-dcloud-01",
+        "metadata": {
+            "description": "The name of the Local Gateway Name eg lgw-dcloud-01"
+        }
+    },
+        "lgwsubnet": {
+        "type": "string",
+        "metadata": {
+            "description": "The subnet for the local gateway eg 192.168.0.0/24,192.168.1.0/24"
+        }
+    },
+        "lgwgatewayip": {
+        "type": "string",
+        "metadata": {
+            "description": "The Public IP address of the VPN target eg 203.111.111.111"
+        }
+    },
+        "vpnconnectionname": {
+        "type": "string",
+        "defaultValue": "cn-vgw-infrastructure-to-lgw-dcloud",
+        "metadata": {
+            "description": "description"
+        }
+    },
+        "vpnconnectionsharedkey": {
+        "type": "string",
+        "metadata": {
+            "description": "The shared key for the vpn connection. Generate from a secure password generator"
+        }
+    }
+    },
+    "functions": [],
+    "variables": {},
+    "resources": [
+        {
+        "name": "[parameters('vnetname')]",
+        "type": "Microsoft.Network/virtualNetworks",
+        "apiVersion": "2020-11-01",
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "displayName": "[parameters('vnetname')]"
+        },
+        "properties": {
+            "addressSpace": {
+                "addressPrefixes": [
+                    "[parameters('vnetaddress')]"
+                ]
+            },
+            "subnets": [
+                {
+                    "name": "[parameters('snetname')]",
+                    "properties": {
+                        "addressPrefix": "[parameters('snetprefix')]"
+                    }
+                },
+                {
+                    "name": "[parameters('vgwsubnetname')]",
+                    "properties": {
+                    "addressPrefix": "[parameters('vgwsubnetprefix')]"
+            }
+                }
+            ]
+        }
+    },
+    {
+        "name": "[parameters('vgwpublicipname')]",
+        "type": "Microsoft.Network/publicIPAddresses",
+        "apiVersion": "2020-11-01",
+        "location": "[resourceGroup().location]",
+        "tags": {
+            "displayName": "[parameters('vgwpublicipname')]"
+        },
+        "properties": {
+            "publicIPAllocationMethod": "Dynamic"
+        }
+    },
+    {
+        "name": "[parameters('vpngatewayname')]",
+        "type": "Microsoft.Network/virtualNetworkGateways",
+        "apiVersion": "2020-11-01",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[resourceId('Microsoft.Network/publicIPAddresses', parameters('vgwpublicipname'))]",
+            "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetname'))]"
+        ],
+        "properties": {
+            "ipConfigurations": [
+                {
+                    "name": "vnetGatewayConfig",
+                    "properties": {
+                        "privateIPAllocationMethod": "Dynamic",
+                        "subnet": {
+                            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('vnetname'), parameters('vgwsubnetname'))]"
+                        },
+                        "publicIPAddress": {
+                            "id": "[resourceId('Microsoft.Network/publicIPAddresses', parameters('vgwpublicipname'))]"
+                        }
+                    }
+                }
+            ],
+            "sku": {
+                "name": "[parameters('vpngatewaysku')]",
+                "tier": "[parameters('vpngatewaysku')]"
+            },
+            "gatewayType": "Vpn",
+            "vpnType": "RouteBased",
+            "enableBgp": false
+        }
+    },
+    {
+        "name": "[parameters('localgatewayname')]",
+        "type": "Microsoft.Network/localNetworkGateways",
+        "apiVersion": "2020-11-01",
+        "location": "[resourceGroup().location]",
+        "properties": {
+            "localNetworkAddressSpace": {
+                "addressPrefixes": [
+                    "[parameters('lgwsubnet')]"
+                ]
+            },
+            "gatewayIpAddress": "[parameters('lgwgatewayip')]"
+        }
+    },
+    {
+        "name": "[parameters('vpnconnectionname')]",
+        "type": "Microsoft.Network/connections",
+        "apiVersion": "2020-11-01",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+            "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('vpngatewayname'))]",
+            "[resourceId('Microsoft.Network/localNetworkGateways', parameters('localgatewayname'))]"
+        ],
+        "properties": {
+            "virtualNetworkGateway1": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworkGateways', parameters('vpngatewayname'))]"
+            },
+            "localNetworkGateway2": {
+                "id": "[resourceId('Microsoft.Network/localNetworkGateways', parameters('localgatewayname'))]"
+            },
+            "connectionType": "IPsec",
+            "routingWeight": 0,
+            "sharedKey": "[parameters('vpnconnectionsharedkey')]"
+        }
+    }],
+    "outputs": {}
+}
