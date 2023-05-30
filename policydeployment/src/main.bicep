@@ -12,6 +12,9 @@ module policySet_baseline 'initiatives/baseline.bicep' = {
 
 resource assignment_baseline 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
   name: 'DITPolicyInitiativeAssignment'
+  identity: {
+    type: 'SystemAssigned'
+  }
   properties: {
     policyDefinitionId: policySet_baseline.outputs.definitionId
     enforcementMode: 'DoNotEnforce'
