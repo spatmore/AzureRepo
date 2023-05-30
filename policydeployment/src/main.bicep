@@ -2,6 +2,8 @@ targetScope = 'subscription'
 
 var config = loadJsonContent('main.json')
 
+var assignmentlocation = 'australiaeast'
+
 module policySet_baseline 'initiatives/baseline.bicep' = {
   name: 'DITPolicyInitiative'
   params: {
@@ -11,7 +13,8 @@ module policySet_baseline 'initiatives/baseline.bicep' = {
 }
 
 resource assignment_baseline 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
-  name: 'DITPolicyInitiativeAssignment'
+ name: 'DITPolicyInitiativeAssignment'
+ location: assignmentlocation
   identity: {
     type: 'SystemAssigned'
   }
