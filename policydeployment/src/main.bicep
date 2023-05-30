@@ -1,28 +1,20 @@
 targetScope = 'subscription'
 
-var config = loadJsonContent('main.json') 
+var config = loadJsonContent('main.json')
 
 module policySet_baseline 'initiatives/baseline.bicep' = {
-  name: 'moduleName'
+  name: 'DITPolicyInitiative'
   params: {
     config: config
-    initiativeName: 'policySet'
+    initiativeName: 'DITPolicyInitiative'
   }
 }
 
 resource assignment_baseline 'Microsoft.Authorization/policyAssignments@2022-06-01' = {
-  name: 'australiaBaseline'
+  name: 'DITPolicyInitiativeAssignment'
   properties: {
     policyDefinitionId: policySet_baseline.outputs.definitionId
     enforcementMode: 'DoNotEnforce'
-    parameters: {
-      allowedLocations: {
-        value: [
-          'australiaeast'
-          'australiasoutheast'
-        ]
-      }
-    }
+    parameters: {}
   }
 }
- 
