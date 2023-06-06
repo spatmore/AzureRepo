@@ -5,5 +5,5 @@ az deployment sub create --name advisor_digest_deployment --location australiaea
 ```
 
 ```PS
-New-AzDeployment -Name AdvisorDigestDeployment -Location "Australia East" -TemplateFile ".\src\main.bicep" -digestRootName digest-<cust>
+New-AzDeployment -Name AdvisorDigestDeployment -Location "Australia East" -TemplateFile ".\src\main.bicep" -digestName digest-<cust>
 ```
